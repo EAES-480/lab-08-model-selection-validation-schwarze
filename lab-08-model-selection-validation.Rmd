@@ -1,5 +1,5 @@
 ---
-title: "Lab 08 — Model Selection and Validation"
+title: "Lab 07 — Model Selection and Validation"
 author: "EAES 480 — Modern Statistics in Earth & Environmental Science"
 date: "`r format(Sys.Date(), '%B %d, %Y')`"
 output:
@@ -12,7 +12,7 @@ output:
     code_folding: hide
     df_print: paged
 editor_options:
-  chunk_output_type: console
+  chunk_output_type: inline
 ---
 
 ```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
@@ -68,7 +68,7 @@ By the end of this lab, you should be able to:
 
 df <- read_csv("data/us-ams-simple.csv", na = c("-9999")) %>%
   clean_names() %>%
-  filter(year_local == ___)
+  filter(year_local == 2023)
 
 glimpse(df)
 ```
@@ -100,15 +100,17 @@ Possible examples:
 - predictors: `ta`, `swc`, `vpd`, `rg`
 
 ```{r choose_vars, echo=TRUE, eval=FALSE}
-response_var <- "___"
-pred1 <- "___"
-pred2 <- "___"
+response_var <- "gpp"
+pred1 <- "ta"
+pred2 <- "swc"
 
 # CHECK: do these variables exist?
 c(response_var, pred1, pred2) %in% names(df)
 ```
 
 > Which variables did you choose, and why do you think they may be related?
+
+The variables I chose were `gpp` for my response variable and `ta` and `swc` as my predictor variables. I chose air temperature and soil water content as predictor variables of gross primary productivity since the productivity of plants and their carbon sequestration can be correlated to how much water they recieve from the ground and temperatures they can survive in. 
 
 ---
 
@@ -120,7 +122,7 @@ Keep only rows with non-missing values for your chosen variables.
 # GOAL: Create an analysis data frame using only complete cases.
 
 df_mod <- df %>%
-  select(___, ___, ___) %>%
+  select(gpp, ta, swc) %>%
   drop_na()
 
 glimpse(df_mod)
@@ -136,9 +138,9 @@ Fit:
 - **Model 3:** response ~ pred1 + pred2
 
 ```{r fit_models, echo=TRUE, eval=FALSE}
-m1 <- lm(___ ~ ___, data = df_mod)
-m2 <- lm(___ ~ ___, data = df_mod)
-m3 <- lm(___ ~ ___ + ___, data = df_mod)
+m1 <- lm(gpp ~ ta, data = df_mod)
+m2 <- lm(gpp ~ swc, data = df_mod)
+m3 <- lm(gpp ~ ta + swc, data = df_mod)
 ```
 
 ---
@@ -152,6 +154,8 @@ tidy(m3)
 ```
 
 > Which coefficients are positive? Which are negative? Do they make scientific sense?
+
+The positive coefficient in the data is `ta`, with a coefficient of around 0.546 and `swc` is negative with a coefficient of around -0.0657. I think the `ta` coefficient makes sense since as conditions become warmer, plants typically become more productive (to an extent). However, I do not think the `swc` coefficient makes sense since plants would be more productive with more available moisture.  
 
 ---
 
@@ -184,6 +188,8 @@ ggplot(df_mod, aes(x = .data[[pred2]], y = .data[[response_var]])) +
 ```
 
 > Visually, which model seems stronger? Why?
+
+The model that appears to be stronger is Model 1, since the correlation between the two variables appears to be stronger. Looking at the distribution in Model 2, the points are a lot more uniform and the correlation is more flatter, while still being negative. In Model 1, the points are less uniformly distributed and the slope is steeper, indicating a stronger relationship.
 
 ---
 
@@ -228,6 +234,8 @@ tibble(
 
 > In words, what do SST and SSE represent?
 
+SST represents the total amount of variability in the dataset in regards to the response variable. SSE represents any variation that is unexplained. 
+
 ---
 
 ## 8) Compute R-squared manually for Model 1
@@ -237,7 +245,7 @@ Use:
 $R^2 = 1 - SSE / SST$
 
 ```{r r2_manual, echo=TRUE, eval=FALSE}
-r2_m1_manual <- ___
+r2_m1_manual <- 1 - sse_m1 / sst
 
 r2_m1_manual
 ```
@@ -250,6 +258,8 @@ glance(m1)
 
 > Does your manual R-squared match the value from `glance()`?
 
+My manual value does match the value from `glance()`. 
+
 ---
 
 ## 10) Compute MSE and RMSE for Model 1
@@ -260,8 +270,8 @@ Use:
 - $RMSE = sqrt(MSE)$
 
 ```{r mse_rmse_m1, echo=TRUE, eval=FALSE}
-mse_m1 <- ___
-rmse_m1 <- ___
+mse_m1 <- mean(aug_m1$.resid^2)
+rmse_m1 <- sqrt(mse_m1)
 
 tibble(
   mse_m1 = mse_m1,
@@ -270,6 +280,8 @@ tibble(
 ```
 
 > What does RMSE mean in the units of your response variable?
+
+RMSE represents the difference between predicted values and the actual observed data points. Since it is generally low, that means the model is relatively accurate.  
 
 ---
 
@@ -285,6 +297,8 @@ bind_rows(
 ```
 
 > Which model has the highest R-squared? Is that enough to call it the best model?
+
+The model with the highest R-squared value is Model 3, but that is not enough information to call it the best model. It just means that there is the least variance in the data points between the response and predictor variable. 
 
 ---
 
@@ -307,6 +321,8 @@ rmse_tbl
 ```
 
 > Which model has the smallest RMSE? Does that agree with the R-squared ranking?
+
+The model with the smallest RMSE value is Model 3, which does  agree with the R-squared ranking, as Model 3 had the largest R-squared value. 
 
 ---
 
@@ -340,6 +356,8 @@ ggplot(aug_m3, aes(x = .fitted, y = .resid)) +
 
 > Do the residual plots suggest any problems (curvature, changing variance, outliers)? Which model looks more appropriate?
 
+The residual plots suggest --------------
+
 ---
 
 ## 14) Make a model selection decision
@@ -348,18 +366,19 @@ Choose the model you think is best supported by the evidence.
 
 Fill in:
 
-> My preferred model is `___`
+> My preferred model is `Model 3`
 
 > I based this decision on:
-> - `___`
-> - `___`
-> - `___`
+> - `RMSE value`
+> - `R-Squared value`
+> - `Residuals Plot`
 
 **Prompt (5–7 sentences):** Explain why you chose this model. Use at least two quantitative criteria (such as R-squared, RMSE, or sigma) and one visual criterion (such as the residual plot or scatterplot). Also explain why a different model was less convincing.
 
-> *Write your answer here.*
+> I chose Model 3 as my preferred model because ---------------. 
 
 ---
+
 
 # Part II — Train/Test Splits and Cross-Validation
 
@@ -394,14 +413,16 @@ Possible examples depend on your file, but might include things like:
 
 ```{r choose_new_predictors, echo=TRUE, eval=FALSE}
 response_var <- "le"
-pred1 <- "___"
-pred2 <- "___"
+pred1 <- "fc"
+pred2 <- "gpp"
 
 # CHECK: do these exist?
 c(response_var, pred1, pred2) %in% names(df)
 ```
 
 > Why did you choose these two predictors?
+
+I chose these two predictors because both carbon in the atmosphere and gross primary productivity can influence the amount of latent heat observed in the atmosphere, and flux carbon and gpp are also closely linked variables.
 
 ---
 
@@ -411,13 +432,15 @@ Keep only complete cases for the response and the two predictors.
 
 ```{r make_prediction_df, echo=TRUE, eval=FALSE}
 df_pred <- df %>%
-  select(___, ___, ___) %>%
+  select(le, gpp, fc) %>%
   drop_na()
 
 glimpse(df_pred)
 ```
 
 > How many observations remain after removing missing values?
+
+The same number of observations, which is 16,973, remained after removing the missing values. 
 
 ---
 
@@ -426,7 +449,7 @@ glimpse(df_pred)
 Use 20% of the data as a final **test set**.
 
 ```{r split_train_test, echo=TRUE, eval=FALSE}
-set.seed(___)
+set.seed(41)
 
 df_shuf <- df_pred %>%
   slice_sample(prop = 1)
@@ -445,6 +468,8 @@ tibble(
 
 > Why do we keep the test set separate from model selection?
 
+You keep the test set separate from the model selection because the isolation ensures the model is unbiased towards the data. 
+
 ---
 
 ## 18) Define two candidate models
@@ -456,16 +481,16 @@ Use:
 
 Write them out in words below:
 
-> Model 1: `___`
+> Model 1: `Linear regression model using flux carbon to predict latent heat`
 
-> Model 2: `___`
+> Model 2: `Linear regression model using flux carbon and gross primary productivity to predict latent heat`
 
 ---
 
 ## 19) Create 4 folds on the training data
 
 ```{r make_cv_folds, echo=TRUE, eval=FALSE}
-set.seed(___)
+set.seed(41)
 
 train_folds <- train_data %>%
   mutate(fold = rep(1:4, length.out = n()))
@@ -474,6 +499,8 @@ train_folds %>% count(fold)
 ```
 
 > Why do we create folds only on the training data, and not using the test data?
+
+We create folds only on the training data because it prevents overfitting the data, or making the model capture random fluctuations in the data rather than the important patterns. 
 
 ---
 
@@ -491,8 +518,8 @@ cv_results <- map_dfr(1:4, function(k) {
   cv_train <- train_folds %>% filter(fold != k)
   cv_valid <- train_folds %>% filter(fold == k)
 
-  m1 <- lm(___ ~ ___, data = cv_train)
-  m2 <- lm(___ ~ ___ + ___, data = cv_train)
+  m1 <- lm(le ~ fc, data = cv_train)
+  m2 <- lm(le ~ fc + gpp, data = cv_train)
 
   tibble(
     fold = k,
@@ -517,8 +544,8 @@ Compute the mean and SD of RMSE across folds.
 cv_summary <- cv_results %>%
   group_by(model) %>%
   summarise(
-    mean_rmse = ___,
-    sd_rmse = ___,
+    mean_rmse = mean(rmse),
+    sd_rmse = sd(rmse),
     .groups = "drop"
   )
 
@@ -527,6 +554,8 @@ cv_summary
 
 > Which model has the lower average validation RMSE?  
 > What does the SD across folds tell you?
+
+The model with the lower average RMSE is Model 2. The SD across folds tells me ------------------. 
 
 ---
 
@@ -546,13 +575,15 @@ ggplot(cv_results, aes(x = factor(fold), y = rmse, color = model, group = model)
 
 > Does one model win consistently across folds, or only sometimes?
 
+Model 2 consistently wins across folds because it's values are consistently lower ----. 
+
 ---
 
 ## 23) Choose your preferred model
 
 Fill in:
 
-> My selected model is: `___`
+> My selected model is: `Model 2`
 
 > I chose it because: `___`
 
@@ -563,7 +594,7 @@ Fill in:
 Use all of `train_data` now that you have selected the model.
 
 ```{r refit_final_model, echo=TRUE, eval=FALSE}
-final_model <- lm(___, data = train_data)
+final_model <- lm(le ~ fc + gpp, data = train_data)
 
 tidy(final_model)
 ```
