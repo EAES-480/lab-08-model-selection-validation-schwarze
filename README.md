@@ -161,7 +161,6 @@ These are not stylistic preferences—they are **scientific standards**.
 You should:
 
 - Commit and push your completed `.Rmd` file to your GitHub repository  
-- Submit the **GitHub repository link** on Canvas  
 
 You do **not** need to submit the knitted HTML unless instructed.
 
