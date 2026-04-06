@@ -322,7 +322,7 @@ rmse_tbl
 
 > Which model has the smallest RMSE? Does that agree with the R-squared ranking?
 
-The model with the smallest RMSE value is Model 3, which does  agree with the R-squared ranking, as Model 3 had the largest R-squared value. 
+The model with the smallest RMSE value is Model 3, which does agree with the R-squared ranking, as Model 3 had the largest R-squared value. 
 
 ---
 
@@ -356,9 +356,7 @@ ggplot(aug_m3, aes(x = .fitted, y = .resid)) +
 
 > Do the residual plots suggest any problems (curvature, changing variance, outliers)? Which model looks more appropriate?
 
-The residual plots suggest --------------
-
----
+The residual plots both have similar shapes and suggest bias. The large amount of points on the right form a fan shape and suggest heteroscedasicity, meaning the variance increases. Since the shapes are the same, I cannot determine which model is appropriate from the residuals alone, but since Model 3's residuals fall in a smaller range, I would choose Model 3.
 
 ## 14) Make a model selection decision
 
@@ -371,11 +369,11 @@ Fill in:
 > I based this decision on:
 > - `RMSE value`
 > - `R-Squared value`
-> - `Residuals Plot`
+> - `Residual Plots`
 
 **Prompt (5–7 sentences):** Explain why you chose this model. Use at least two quantitative criteria (such as R-squared, RMSE, or sigma) and one visual criterion (such as the residual plot or scatterplot). Also explain why a different model was less convincing.
 
-> I chose Model 3 as my preferred model because ---------------. 
+> I chose Model 3 as my preferred model. I did this because it had the highest R-squared value, meaning it had the least amount of variance and was more precise. I also chose it because of the RMSE value, which was lower and indicated higher accuracy. The plot of the residuals also suggested it had a slightly lower change in variance when compared to Model 1. I didn't choose Model 1 even though the scatterplot showed a strong correlation because of the high variability in points  
 
 ---
 
@@ -555,7 +553,7 @@ cv_summary
 > Which model has the lower average validation RMSE?  
 > What does the SD across folds tell you?
 
-The model with the lower average RMSE is Model 2. The SD across folds tells me ------------------. 
+The model with the lower average RMSE is Model 2. The SD across folds tells me the model is more stable and shows consistency. 
 
 ---
 
@@ -575,7 +573,7 @@ ggplot(cv_results, aes(x = factor(fold), y = rmse, color = model, group = model)
 
 > Does one model win consistently across folds, or only sometimes?
 
-Model 2 consistently wins across folds because it's values are consistently lower ----. 
+Model 2 consistently wins across folds because it's values are consistently lower and therefore more consistent. 
 
 ---
 
@@ -585,7 +583,7 @@ Fill in:
 
 > My selected model is: `Model 2`
 
-> I chose it because: `___`
+> I chose it because: `of the lower RMSE value and folds`
 
 ---
 
@@ -615,6 +613,8 @@ test_rmse
 
 > How does the test RMSE compare with the cross-validation RMSE?
 
+The test RMSE is slightly higher, but still very close to the same as the cross-validation RMSE. 
+
 ---
 
 ## 26) Final interpretation
@@ -626,7 +626,7 @@ Answer in **5–7 sentences**:
 - Did the chosen model generalize well to test data?
 - What would it mean if test RMSE were much worse than validation RMSE?
 
-> *Write your answer here.*
+> I did not use the test data during model selection because test data is meant to be unbiased, and using it during model selection could lead to overfitting. The cross-validation helped me choose between models since evaluated how each model would peform with the data and provided an estimate on which one operated more accurately. The chosen model did generalize well to the test data. I can tell because the RMSE values were nearly the same. If the test RMSE were much worse than the validation RMSE, that would imply the model had become biased and the data was overfitting. 
 
 ---
 
